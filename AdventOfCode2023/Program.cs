@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            new Day5().RunPart2();
+            new Day7().Part1();
             //Console.ReadLine();
         }
     }
