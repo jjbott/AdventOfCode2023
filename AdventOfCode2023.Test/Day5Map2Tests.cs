@@ -1,6 +1,5 @@
 ﻿global using Assert = NUnit.Framework.Legacy.ClassicAssert;
 using NUnit.Framework;
-using static AdventOfCode2023.Day5;
 
 namespace AdventOfCode2023.Test
 {
@@ -8,7 +7,7 @@ namespace AdventOfCode2023.Test
     {
         [Test]
         public void NoMap() {
-            var map = new Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 1) });
+            var map = new Day5.Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 1) });
             var mapped = map.Lookup2(20, 3);
 
             Assert.AreEqual(1, mapped.Count);
@@ -19,7 +18,7 @@ namespace AdventOfCode2023.Test
         [Test]
         public void NoMap_2()
         {
-            var map = new Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 1) });
+            var map = new Day5.Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 1) });
             var mapped = map.Lookup2(2, 3);
 
             Assert.AreEqual(1, mapped.Count);
@@ -30,7 +29,7 @@ namespace AdventOfCode2023.Test
         [Test]
         public void FullyCoveredMap_1()
         {
-            var map = new Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 5) });
+            var map = new Day5.Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 5) });
             var mapped = map.Lookup2(12, 2);
 
             Assert.AreEqual(1, mapped.Count);
@@ -41,7 +40,7 @@ namespace AdventOfCode2023.Test
         [Test]
         public void Enclosed_1()
         {
-            var map = new Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 5) });
+            var map = new Day5.Day5Map2("a", "b", new List<Day5.Day5Map> { new Day5.Day5Map(10, 10, 5) });
             var mapped = map.Lookup2(5, 15);
 
             Assert.AreEqual(3, mapped.Count);
