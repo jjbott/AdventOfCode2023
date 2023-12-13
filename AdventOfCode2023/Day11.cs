@@ -61,9 +61,6 @@ namespace AdventOfCode2023
                 }
             }
 
-            int maxDistance = 50;
-            int minDistance = int.MaxValue;
-
             long distance = 0;
             int c = 0;
             for (int i = 0; i < galaxies.Count; i++)
@@ -137,7 +134,7 @@ namespace AdventOfCode2023
                 {
                     for (var li = 0; li < expandedLines.Count; ++li)
                     {
-                        expandedRows[li] += 'M';// expandedLines[li][i] == 'M' ? 'G' : 'M';
+                        expandedRows[li] += 'M';
                     }
                 }
                 else
@@ -160,9 +157,6 @@ namespace AdventOfCode2023
                     }
                 }
             }
-
-            int maxDistance = 50;
-            int minDistance = int.MaxValue;
 
             long distance = 0;
             int c = 0;
