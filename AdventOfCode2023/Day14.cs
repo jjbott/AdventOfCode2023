@@ -124,12 +124,6 @@ namespace AdventOfCode2023
 
             for (int i = 0; i < 1000000000; ++i)
             {
-                if (i == 1000)
-                {
-                    i += ((1000000000 - 1000) / 28) * 28; // My example settles on a period of 28. I can skip more but I cant math right now.
-                    continue;
-                }
-
                 ShiftNorth(lines);
                 //Print(lines);
                 lines = Rotate(lines);
