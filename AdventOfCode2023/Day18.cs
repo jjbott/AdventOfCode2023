@@ -222,6 +222,8 @@ namespace AdventOfCode2023
 
         public void Part2b()
         {
+            // Same algorthm as Part2, but uses the easier input format
+
             var lines = File.ReadAllLines("Inputs/Day18.txt");
 
             var steps = lines.Select(l => l.Split(' ')).Select(s => (dir: s[0], dist: int.Parse(s[1]))).ToList();
@@ -254,9 +256,6 @@ namespace AdventOfCode2023
             long count = Count2(nodes);
 
             Console.WriteLine(count);
-
-            // ex:    952408144115
-            // mine: 1169415959064
         }
 
         private static long Count2(List<(int x, int y)> nodes)
@@ -266,54 +265,26 @@ namespace AdventOfCode2023
 
             int y = sorted.First().n.y;
 
-            long count = 0;
             long count2 = 0;
-            var fill = new List<(int c, bool inside, char? start, char? end)>();
 
             var nextNodes = new List<((int x, int y) n, int i)>();
 
-            long lastCount = 0;
+            // How many filled points are on any Y with no nodes
+            long noNodeCount = 0;
+
             long lastY = 0;
 
             foreach (var group in grouped.OrderBy(g => g.Key))
             {
                 long rowCount = 0;
 
-                if (group.First().n.y == grouped.OrderBy(g => g.Key).Last().First().n.y)
-                {
-                    int k = 56;
-                }
-
-                count += lastCount * (group.First().n.y - lastY - 1);
-                rowCount += lastCount * (group.First().n.y - lastY - 1);
+                rowCount += noNodeCount * (group.First().n.y - lastY - 1);
 
                 var g = group.ToList();
-
-
-                /*
-                
-                var fX = 0;
-                for(int i = 0; i < fill.Count; ++i)
-                {
-                    fX += fill[i].c;    
-
-
-                    if (f.i)
-                    {
-                        fX += f.c;
-                    }
-                    else
-                    {
-                        fX -= f.c;
-                    }
-                }
-                */
 
                 char wallStart = '.';
                 char wallEnd = '.';
                 var nodeS = sorted[0];
-                var nodeE = sorted[0];
-                var blockStart = sorted[0];
                 var inside = false;
 
                 foreach (var n in nextNodes)
@@ -324,8 +295,6 @@ namespace AdventOfCode2023
                     }
                 }
                 nextNodes = new List<((int x, int y) n, int i)>();
-
-                fill = new List<(int c, bool inside, char? start, char? end)>();
 
                 var prev2 = g.OrderBy(n => n.n.x).First();
 
@@ -343,9 +312,6 @@ namespace AdventOfCode2023
 
                     if (node.i < 0 || (node.n.y == prev.y && node.n.y == next.y))
                     {
-                        //wallStart = '|';
-                        //fill.Add((node.n.x - fill.Sum(f => f.c) + 1, inside, start: null, end: '|'));
-                        fill.Add((node.n.x - prev2.n.x + (inside ? 1 : -1), inside, start: null, end: '|'));
                         nextNodes.Add((p: (node.n.x, node.n.y + 1), i: -1));
                         inside = !inside;
 
@@ -362,7 +328,6 @@ namespace AdventOfCode2023
                     else if (wallStart == '.')
                     {
                         nodeS = node;
-                        blockStart = node;
 
                         if (!insideStartX.HasValue)
                         {
@@ -382,19 +347,9 @@ namespace AdventOfCode2023
                         {
                             throw new Exception("Dang");
                         }
-                        /*
-                        if (inside)
-                        {
-                            // gap between inside walls
-                            rowCount += node.n.x - insideStartX.Value;
-                            insideStartX = null;
-                        }
-                        */
-                        fill.Add((node.n.x - fill.Sum(f => f.c) - 1, inside, start: null, end: wallStart));
                     }
                     else if (wallStart != '.')
                     {
-                        nodeE = node;
 
                         var prevInside = inside;
 
@@ -439,11 +394,6 @@ namespace AdventOfCode2023
                         {
                             insideStartX = node.n.x + 1;
                         }
-
-
-                        fill.Add((node.n.x - nodeS.n.x + 1, true, start: wallStart, end: wallEnd)); // wall edges are always "inside"
-
-
                     }
 
                     if (wallEnd != '.')
@@ -452,10 +402,7 @@ namespace AdventOfCode2023
                         wallEnd = '.';
                     }
 
-
                     prev2 = node;
-
-
                 }
 
                 Console.WriteLine(rowCount);
@@ -468,40 +415,13 @@ namespace AdventOfCode2023
                     throw new Exception("Dang");
                 }
 
-                lastCount = 0;
+                noNodeCount = 0;
                 for (int i = 0; i < nextNodes.Count; i += 2)
                 {
-                    lastCount += nextNodes[i + 1].n.x - nextNodes[i].n.x + 1;
+                    noNodeCount += nextNodes[i + 1].n.x - nextNodes[i].n.x + 1;
                 }
-                count += fill.Where(f => f.inside).Sum(f => f.c);
             }
             Console.WriteLine(count2);
-
-            /*
-            for (int i = 0; i < sorted.Count; ++i)
-            {
-                int j = 56;
-
-                if ( y != sorted[i].n.y)
-                {
-                    y = sorted[i].n.y;
-                    inside = false;
-                    // TODO: Add to count
-                    fill = new List<(int c, bool i)>();
-                }
-
-               var node = sorted[i];
-
-                
-
-            }
-            */
-
-            // 952408149523
-            // 952408149524
-            // 952408149525
-
-            // 952408144115
 
             return count2;
         }
