@@ -4,8 +4,8 @@
     {
         static void Main(string[] args)
         {
-            new Day17c().Part1();
-            new Day17c().Part2();
+            //new Day18().Part1();
+            new Day18().Part2();
             //Console.ReadLine();
         }
     }
