@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2023
 {
@@ -89,7 +81,6 @@ namespace AdventOfCode2023
 
                 if (parsingWorkflows)
                 {
-                    // vns{m>1190:xxl,x>1874:R,a>2111:dfq,A}
                     var workflow = new Workflow { Name = line.Split("{")[0] };
                     var rules = line.Split("{")[1].Split("}")[0].Split(',');
                     foreach (var r in rules)
@@ -169,7 +160,6 @@ namespace AdventOfCode2023
 
                 if (parsingWorkflows)
                 {
-                    // vns{m>1190:xxl,x>1874:R,a>2111:dfq,A}
                     var workflow = new Workflow { Name = line.Split("{")[0] };
                     var rules = line.Split("{")[1].Split("}")[0].Split(',');
                     foreach (var r in rules)
@@ -238,14 +228,10 @@ namespace AdventOfCode2023
                 return false;
             }
 
-            // enumarate failure paths
-
-            var rulePaths = new List<List<Rule>>();
             var queue =
                 new List<(
                     Workflow wf,
                     int ruleIndex,
-                    List<Rule> r,
                     List<string> r2,
                     Dictionary<char, (int min, int max)> minmax
                 )>();
@@ -259,24 +245,17 @@ namespace AdventOfCode2023
 
             var validMinMaxes = new List<Dictionary<char, (int min, int max)>>();
 
-            queue.Add((workflows["in"], 0, new List<Rule>(), new List<string>(), minmax));
+            queue.Add((workflows["in"], 0, new List<string>(), minmax));
             while (queue.Any())
             {
                 var current = queue[0];
                 queue.RemoveAt(0);
-
-                var rules = new List<Rule>(current.r);
-
-                //foreach (var rule in current.wf.Rules)
-                //{
 
                 var rule = current.wf.Rules[current.ruleIndex];
 
                 var nextMinMax = new Dictionary<char, (int min, int max)>(current.minmax);
                 if (rule.Result == "A")
                 {
-
-
                     if (rule.comparison != null)
                     {
                         // on success, apply the rule and count
@@ -286,10 +265,6 @@ namespace AdventOfCode2023
                             validCount += nextMinMax.Values.Aggregate((long)1, (a, v) => a * ((long)v.max - (long)v.min + 1));
                         }
 
-
-                        rules.Add(rule);
-
-
                         // failure. Stay in this workflow, but go to next rule
                         nextMinMax = new Dictionary<char, (int min, int max)>(current.minmax);
                         if (ApplyRuleToMinmax(rule, nextMinMax, true))
@@ -298,7 +273,7 @@ namespace AdventOfCode2023
                             newR2.Add($"{current.wf.Name} {rule} fail");
 
                             queue.Add(
-                                (current.wf, current.ruleIndex + 1, new List<Rule>(rules), newR2, nextMinMax)
+                                (current.wf, current.ruleIndex + 1, newR2, nextMinMax)
                             );
                         }
                     }
@@ -307,7 +282,6 @@ namespace AdventOfCode2023
                         validMinMaxes.Add(nextMinMax);
                         validCount += current.minmax.Values.Aggregate((long)1, (a, v) => a * ((long)v.max - (long)v.min + 1));
                     }
-                    rulePaths.Add(new List<Rule>(rules));
                 }
                 else if (rule.Result == "R")
                 {
@@ -323,31 +297,20 @@ namespace AdventOfCode2023
                             newR2.Add($"{current.wf.Name} {rule} failure");
 
                             queue.Add(
-                                (current.wf, current.ruleIndex + 1, new List<Rule>(rules), newR2, nextMinMax)
+                                (current.wf, current.ruleIndex + 1, newR2, nextMinMax)
                             );
                         }
                     }
                 }
                 else
                 {
-                    // We're going to the next rule, so this one failed. Flip the sign on it
-                    /*rules.Add(new Rule
-                    {
-                        variable = rule.variable,
-                        comparison = rule.comparison == "<" ? ">=" : "<='",
-                        value = rule.value,
-                        Result = rule.Result
-                    });*/
-
                     if (rule.comparison == null)
                     {
-                        rules.Add(rule);
-
                         var newR2 = new List<string>(current.r2);
                         newR2.Add($"{current.wf.Name} {rule} succeed");
 
                         queue.Add(
-                            (workflows[rule.Result], 0, new List<Rule>(rules), newR2, current.minmax)
+                            (workflows[rule.Result], 0, newR2, current.minmax)
                         );
                     }
                     else
@@ -359,8 +322,7 @@ namespace AdventOfCode2023
                             var newR2 = new List<string>(current.r2);
                             newR2.Add($"{current.wf.Name} {rule} succeed");
 
-                            rules.Add(rule);
-                            queue.Add((workflows[rule.Result], 0, new List<Rule>(rules), newR2, nextMinMax));
+                            queue.Add((workflows[rule.Result], 0, newR2, nextMinMax));
                         }
 
                         // failure. Stay in this workflow, but go to next rule
@@ -371,58 +333,12 @@ namespace AdventOfCode2023
                             newR2.Add($"{current.wf.Name} {rule} failure");
 
                             queue.Add(
-                                (current.wf, current.ruleIndex + 1, new List<Rule>(rules), newR2, nextMinMax)
+                                (current.wf, current.ruleIndex + 1, newR2, nextMinMax)
                             );
                         }
                     }
                 }
-                //}
             }
-
-            
-            /*
-            foreach (var rulePath in rulePaths)
-            {
-                var minmax = new Dictionary<char, (int min, int max)>();
-                minmax['x'] = (min: 1, max: 4000);
-                minmax['m'] = (min: 1, max: 4000);
-                minmax['a'] = (min: 1, max: 4000);
-                minmax['s'] = (min: 1, max: 4000);
-
-                foreach (var rule in rulePath)
-                {
-                    if (rule.comparison == "<")
-                    {
-                        minmax[rule.variable] = (minmax[rule.variable].min, (int)Math.Min(minmax[rule.variable].max, rule.value - 1));
-                    }
-                    else if (rule.comparison == "<=")
-                    {
-                        minmax[rule.variable] = (minmax[rule.variable].min, (int)Math.Min(minmax[rule.variable].max, rule.value));
-                    }
-                    else if (rule.comparison == ">")
-                    {
-                        minmax[rule.variable] = ((int)Math.Max(minmax[rule.variable].min, rule.value + 1), minmax[rule.variable].max);
-                    }
-                    else if (rule.comparison == ">=")
-                    {
-                        minmax[rule.variable] = ((int)Math.Max(minmax[rule.variable].min, rule.value), minmax[rule.variable].max);
-                    }
-
-
-                }
-
-                validCount += minmax.Values.Aggregate((long)1, (a, v) => a * (long)v.max - (long)v.min + 1);
-
-                Console.WriteLine($"X: {minmax['x'].min} {minmax['x'].max}");
-                Console.WriteLine($"M: {minmax['m'].min} {minmax['m'].max}");
-                Console.WriteLine($"A: {minmax['a'].min} {minmax['a'].max}");
-                Console.WriteLine($"S: {minmax['s'].min} {minmax['s'].max}");
-                Console.WriteLine();
-
-
-
-            }
-            */
             
             bool Contains(Dictionary<char, (int min, int max)> a, Dictionary<char, (int min, int max)> b)
             {
@@ -437,46 +353,7 @@ namespace AdventOfCode2023
                 return true;
             }
 
-            long validCount2 = 0;
-
-
-            foreach (var m in validMinMaxes)
-            {
-                Console.WriteLine($"X: {m['x'].min} {m['x'].max}");
-                Console.WriteLine($"M: {m['m'].min} {m['m'].max}");
-                Console.WriteLine($"A: {m['a'].min} {m['a'].max}");
-                Console.WriteLine($"S: {m['s'].min} {m['s'].max}");
-                Console.WriteLine(m.Values.Aggregate((long)1, (a, v) => a * ((long)v.max - (long)v.min + 1)));
-                
-
-                if (validMinMaxes.Any(m2 => m != m2 && Contains(m2, m)))
-                {
-                    Console.WriteLine("contained in another");
-                }
-                else
-                {
-                    validCount2 += m.Values.Aggregate((long)1, (a, v) => a * ((long)v.max - (long)v.min + 1));
-                }
-                Console.WriteLine();
-            }
-
             Console.WriteLine(validCount);
-            int l = 56;
-
-            // 484078879986150
-            // 1802577951901556
-            // 878154863249802
-            // 455492475000000
-
-            // 167409079868000
-            // 
-            //  15320205000000
-            //  20576430000000
-            //  35328000000000
-            //  85632000000000
-            //  42635840000000
-            // 156928000000000
-            //  99072000000000
         }
     }
 }
