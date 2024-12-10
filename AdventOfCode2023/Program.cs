@@ -4,8 +4,9 @@
     {
         static void Main(string[] args)
         {
-            new Day19().Part1();
-            new Day19().Part2(@"Inputs/Day19.txt");
+            //new Day24().Part1();
+            new _2024.Day10b().Run();
+            //new _2024.Day6b().Test1();
             //Console.ReadLine();
         }
     }
