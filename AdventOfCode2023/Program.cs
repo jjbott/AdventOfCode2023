@@ -4,10 +4,7 @@
     {
         static void Main(string[] args)
         {
-            //new Day24().Part1();
-            new _2024.Day10b().Run();
-            //new _2024.Day6b().Test1();
-            //Console.ReadLine();
+            new _2024.Day12b().Run();
         }
     }
 }

@@ -9,6 +9,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Update="2024\Inputs\Day12.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="2024\Inputs\Day10Example2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
